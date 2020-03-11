@@ -22,6 +22,59 @@ typedef struct txtTab{
     int content;
 } txt;
 
+int esdMaker(esd e[],loader l[],int num){
+    strcpy(e[0].name,l[0].name);
+    strcpy(e[0].type,"SD");
+    strcpy(e[0].id,"01");
+    e[0].rel = 0;
+    e[0].length = l[num-1].rel;
+
+    int argLen = strlen(l[1].arg) , i = 0 ,esdPointer = 1;
+    while(i<argLen){
+        int j = 0;
+        char temp[30];
+        while(i<argLen && l[1].arg[i] != ',' && l[1].arg[i] != ' '){
+            temp[j] = l[1].arg[i];
+            i++;
+            j++;
+        }
+        temp[j] = '\0';
+        strcpy(e[esdPointer].name,temp);
+        strcpy(e[esdPointer].type,"LD");
+        strcpy(e[esdPointer].id,"--");
+        e[esdPointer].length = 0;
+        e[esdPointer].rel = entryRelLocn(e[esdPointer].name , l , num);
+        esdPointer++;
+        i++;
+    }
+    argLen = strlen(l[2].arg);
+    i = 0;
+    int erCount = esdPointer - 2;
+    while(i<argLen){
+        int j = 0;
+        char temp[30];
+        while(i<argLen && l[2].arg[i] != ',' && l[2].arg[i] != ' '){
+            temp[j] = l[2].arg[i];
+            i++;
+            j++;
+        }
+        temp[j] = '\0';
+        char tt[30];
+        sprintf(tt,"0%d",(esdPointer - erCount));
+        strcpy(e[esdPointer].name,temp);
+        strcpy(e[esdPointer].type,"ER");
+        strcpy(e[esdPointer].id,tt);
+        e[esdPointer].length = 0;
+        e[esdPointer].rel = 0;
+        esdPointer++;
+        i++;
+    }
+
+    return(esdPointer);
+}
+
+
+
 int main()
 {
     int n=30 , i = 0;
@@ -59,5 +112,6 @@ int main()
     }
     int num = i;
     txt t[30];
+    int esdPointer = esdMaker(e,l,num);
 
 }
