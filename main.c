@@ -80,6 +80,13 @@ int esdMaker(esd e[],loader l[],int num){
     return(esdPointer);
 }
 
+void printESD(esd e[],int esdPointer){
+    printf("\nESD Table\n");
+    printf("\n%s\t%s\t%s\t%s\t%s\n","Name","Type","ID","Rel","Length");
+    for(int i=0;i<esdPointer;i++)
+        printf("\n%s\t%s\t%s\t%d\t%d\n",e[i].name,e[i].type,e[i].id,e[i].rel,e[i].length);
+
+}
 
 
 int main()
@@ -120,5 +127,6 @@ int main()
     int num = i;
     txt t[30];
     int esdPointer = esdMaker(e,l,num);
-
+    printESD(e,esdPointer);
+    return 0;
 }
