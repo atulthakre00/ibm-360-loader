@@ -22,6 +22,13 @@ typedef struct txtTab{
     int content;
 } txt;
 
+int entryRelLocn(char entry[] , loader l[] ,int n){
+    for(int i=0;i<n;i++){
+        if(strcmp(l[i].name , entry) == 0)
+            return(l[i].rel);
+    }
+}
+
 int esdMaker(esd e[],loader l[],int num){
     strcpy(e[0].name,l[0].name);
     strcpy(e[0].type,"SD");
