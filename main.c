@@ -29,6 +29,13 @@ int entryRelLocn(char entry[] , loader l[] ,int n){
     }
 }
 
+int relLocnESD(char a[] , esd e[] ,int n){
+    for(int i=0;i<n;i++){
+        if(strcmp(e[i].name , a) == 0)
+            return(e[i].rel);
+    }
+}
+
 int esdMaker(esd e[],loader l[],int num){
     strcpy(e[0].name,l[0].name);
     strcpy(e[0].type,"SD");
@@ -87,7 +94,6 @@ void printESD(esd e[],int esdPointer){
         printf("\n%s\t%s\t%s\t%d\t%d\n",e[i].name,e[i].type,e[i].id,e[i].rel,e[i].length);
 
 }
-
 
 int main()
 {
