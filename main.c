@@ -95,6 +95,41 @@ void printESD(esd e[],int esdPointer){
 
 }
 
+addressConstEvaluator(char address[] ,esd e[] , int esdPointer){
+    int len = strlen(address);
+    int i = 2;
+    int ans = 0;
+    char op = '+';
+    while(i<len){
+        int pointer = 0;
+        char temp[30];
+        while(i<len && address[i] != ')'){
+            if(address[i] == '+' || address[i] == '-'){
+                break;
+            }
+            else
+                temp[pointer++] = address[i++];
+        }
+        temp[pointer] = '\0';
+        if(op == '+'){
+            if(temp[0] > '0' && temp[0] < '9')
+                ans += atoi(temp);
+            else
+                ans += relLocnESD(temp , e ,esdPointer);
+        }
+        else{
+             if(temp[0] > '0' && temp[0] < '9')
+                ans -= atoi(temp);
+            else
+                ans -= relLocnESD(temp , e ,esdPointer);
+        }
+        op = address[i];
+        printf("\n#%s %d#\n",temp,ans);
+        i++;
+    }
+    return(ans);
+}
+
 int main()
 {
     int n=30 , i = 0;
@@ -134,5 +169,6 @@ int main()
     txt t[30];
     int esdPointer = esdMaker(e,l,num);
     printESD(e,esdPointer);
+
     return 0;
 }
