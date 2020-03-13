@@ -157,6 +157,13 @@ int txtMaker(txt t[] , loader l[] , esd e[] , int n , int esdPointer){
     return(txtPointer);
 }
 
+void printTxt(txt t[] ,int txtPointer){
+    printf("\nTXT Table\n");
+    printf("\nRel\tContent\n");
+    for(int i=0;i<txtPointer;i++)
+        printf("\n%2d-%2d\t%d\n",t[i].rel,(t[i].rel + 3),t[i].content);
+}
+
 int main()
 {
     int n=30 , i = 0;
@@ -197,6 +204,7 @@ int main()
     int esdPointer = esdMaker(e,l,num);
     printESD(e,esdPointer);
     int txtPointer = txtMaker(t , l , e , num , esdPointer);
+    printTxt(t ,txtPointer);
 
     return 0;
 }
