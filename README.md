@@ -5,3 +5,9 @@ It is C program which takes a assembly program or different segmenents of one co
           Format of ESD Table
           
            TYPE               ESDID               Relative Location             Length
+
+          
+          Format of TXT Table
+          
+          Relative Location             Content
+          
