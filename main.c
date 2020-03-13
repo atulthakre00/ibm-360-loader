@@ -130,6 +130,33 @@ addressConstEvaluator(char address[] ,esd e[] , int esdPointer){
     return(ans);
 }
 
+int txtMaker(txt t[] , loader l[] , esd e[] , int n , int esdPointer){
+    int k = 0 , txtPointer = 0;
+    while(k < n){
+        if(strcmp(l[k].inst , "DC") == 0){
+            int addCount = 0;
+            int argLen = strlen(l[k].arg) , i = 0;
+            while(i<argLen){
+                int j = 0;
+                char temp[30];
+                while(i<argLen && l[k].arg[i] != ',' && l[k].arg[i] != ' '){
+                    temp[j] = l[k].arg[i];
+                    i++;
+                    j++;
+                }
+                temp[j] = '\0';
+                t[txtPointer].content = addressConstEvaluator(temp,e,esdPointer);
+                t[txtPointer].rel = l[k].rel + 4*addCount;
+                i++;
+                addCount++;
+                txtPointer++;
+            }
+        }
+        k++;
+    }
+    return(txtPointer);
+}
+
 int main()
 {
     int n=30 , i = 0;
@@ -169,6 +196,7 @@ int main()
     txt t[30];
     int esdPointer = esdMaker(e,l,num);
     printESD(e,esdPointer);
+    int txtPointer = txtMaker(t , l , e , num , esdPointer);
 
     return 0;
 }
