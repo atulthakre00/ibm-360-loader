@@ -164,6 +164,19 @@ void printTxt(txt t[] ,int txtPointer){
         printf("\n%2d-%2d\t%d\n",t[i].rel,(t[i].rel + 3),t[i].content);
 }
 
+char *esdIdFromSym(esd e[],int esdPointer, char a[]){
+    int i = 0;
+    while(i<esdPointer){
+        if(strcmp(e[i].name,a) == 0){
+            if(strcmp(e[i].type,"SD") == 0 || strcmp(e[i].type,"LD") == 0)
+                return("01");
+            else
+                return(e[i].id);
+        }
+        i++;
+    }
+}
+
 int main()
 {
     int n=30 , i = 0;
