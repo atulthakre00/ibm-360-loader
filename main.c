@@ -178,66 +178,6 @@ char *esdIdFromSym(esd e[],int esdPointer, char a[]){
 }
 
 
-int rldMaker(rld r[],esd e[],int esdPointer,loader l[],int n){
-    int i = 0 ,k = 0 ,rldPointer = 0;
-    while(k < n){
-        if(strcmp(l[k].inst , "DC") == 0){
-            int addCount = 0;
-            int argLen = strlen(l[k].arg) , i = 0;
-            while(i<argLen){
-                int j = 0;
-                char temp[30];
-                while(i<argLen && l[k].arg[i] != ',' && l[k].arg[i] != ' '){
-                    temp[j] = l[k].arg[i];
-                    i++;
-                    j++;
-                }
-                temp[j] = '\0';
-                char op = '+';
-                int z = 0;
-                int zLen = strlen(temp);
-                char tempz[30];
-                int tempZPointer = 0;
-                char * charArray [10];
-                int charPointer = 0;
-                if( fitForRld(temp , e , esdPointer) == 1 ){
-                for(z=2;z<zLen;z++){
-                    if(temp[z] != '+' && temp[z] != '-' && temp[z] != ')'){
-                        tempz[tempZPointer++] = temp[z];
-                    }
-                    else{
-                        tempz[tempZPointer] = '\0';
-                        tempZPointer = 0;
-                        char t2[30];
-                        strcpy(t2,tempz);
-                        charArray[charPointer++] = &t2;
-                        if(!(tempz[0] >= '0' && tempz[0] <= '9')){
-                            strcpy(r[rldPointer].esdId,esdIdFromSym(e,esdPointer,charArray[charPointer-1]));
-                            r[rldPointer].length = 4;
-                            r[rldPointer].flag = op;
-                            r[rldPointer].rel = l[k].rel + 4*addCount;
-                            rldPointer++;
-                        }
-                        op = temp[z];
-                    }
-                }
-                }
-                i++;
-                addCount++;
-            }
-        }
-        k++;
-    }
-    return(rldPointer);
-}
-
-void printRld(rld r[] ,int rldPointer){
-    printf("\n\n\tRLD Table\n");
-    printf("\n\tESDID\tLength\tFlag\tRel Locn\n");
-    for(int i=0;i<rldPointer;i++)
-        printf("\n\t%s\t%d\t%c\t%d\n",r[i].esdId,r[i].length,r[i].flag,r[i].rel);
-}
-
 int esdIndexFromSym(esd e[],int esdPointer, char a[]){
     int i = 0;
     while(i<esdPointer){
@@ -246,6 +186,44 @@ int esdIndexFromSym(esd e[],int esdPointer, char a[]){
         }
         i++;
     }
+}
+
+int fitForRld(char temp[] , esd e[] , int esdPointer){
+    int plusEntryCount = 0 , minusEntryCount = 0 ;
+        char op = '+';
+        int z = 2;
+        int zLen = strlen(temp);
+        char tempz[30];
+        int tempZPointer = 0;
+        char * charArray [10];
+        int charPointer = 0;
+        for(z=2;z<zLen;z++){
+            if(temp[z] != '+' && temp[z] != '-' && temp[z] != ')'){
+                tempz[tempZPointer++] = temp[z];
+            }
+            else{
+                tempz[tempZPointer] = '\0';
+                char t2[30];
+                strcpy(t2,tempz);
+                charArray[charPointer++] = &t2;
+                if(!(tempz[0] >= '0' && tempz[0] <= '9')){
+                    int index = esdIndexFromSym(e,esdPointer, tempz);
+                    if(strcmp(e[index].type , "ER") == 0){
+                        return(1);
+                    }
+                    else if(op == '+')
+                        plusEntryCount += 1;
+                    else
+                        minusEntryCount += 1;
+                }
+                tempZPointer = 0;
+                op = temp[z];
+            }
+        }
+    if(plusEntryCount == minusEntryCount)
+        return(0);
+    else
+        return(1);
 }
 
 int main()
