@@ -22,6 +22,13 @@ typedef struct txtTab{
     int content;
 } txt;
 
+typedef struct rldTab{
+    char esdId[30];
+    int length;
+    char flag;
+    int rel;
+} rld;
+
 int entryRelLocn(char entry[] , loader l[] ,int n){
     for(int i=0;i<n;i++){
         if(strcmp(l[i].name , entry) == 0)
@@ -88,11 +95,10 @@ int esdMaker(esd e[],loader l[],int num){
 }
 
 void printESD(esd e[],int esdPointer){
-    printf("\nESD Table\n");
-    printf("\n%s\t%s\t%s\t%s\t%s\n","Name","Type","ID","Rel","Length");
+    printf("\n\n\tESD Table\n");
+    printf("\n\t%s\t%s\t%s\t%s\t%s\n","Name","Type","ID","Rel","Length");
     for(int i=0;i<esdPointer;i++)
-        printf("\n%s\t%s\t%s\t%d\t%d\n",e[i].name,e[i].type,e[i].id,e[i].rel,e[i].length);
-
+        printf("\n\t%s\t%s\t%s\t%d\t%d\n",e[i].name,e[i].type,e[i].id,e[i].rel,e[i].length);
 }
 
 addressConstEvaluator(char address[] ,esd e[] , int esdPointer){
@@ -124,7 +130,6 @@ addressConstEvaluator(char address[] ,esd e[] , int esdPointer){
                 ans -= relLocnESD(temp , e ,esdPointer);
         }
         op = address[i];
-        printf("\n#%s %d#\n",temp,ans);
         i++;
     }
     return(ans);
@@ -158,10 +163,10 @@ int txtMaker(txt t[] , loader l[] , esd e[] , int n , int esdPointer){
 }
 
 void printTxt(txt t[] ,int txtPointer){
-    printf("\nTXT Table\n");
-    printf("\nRel\tContent\n");
+    printf("\n\n\tTXT Table\n");
+    printf("\n\tRel\tContent\n");
     for(int i=0;i<txtPointer;i++)
-        printf("\n%2d-%2d\t%d\n",t[i].rel,(t[i].rel + 3),t[i].content);
+        printf("\n\t%2d-%2d\t%d\n",t[i].rel,(t[i].rel + 3),t[i].content);
 }
 
 char *esdIdFromSym(esd e[],int esdPointer, char a[]){
@@ -176,7 +181,6 @@ char *esdIdFromSym(esd e[],int esdPointer, char a[]){
         i++;
     }
 }
-
 
 int rldMaker(rld r[],esd e[],int esdPointer,loader l[],int n){
     int i = 0 ,k = 0 ,rldPointer = 0;
@@ -231,6 +235,62 @@ int rldMaker(rld r[],esd e[],int esdPointer,loader l[],int n){
     return(rldPointer);
 }
 
+void printRld(rld r[] ,int rldPointer){
+    printf("\n\n\tRLD Table\n");
+    printf("\n\tESDID\tLength\tFlag\tRel Locn\n");
+    for(int i=0;i<rldPointer;i++)
+        printf("\n\t%s\t%d\t%c\t%d\n",r[i].esdId,r[i].length,r[i].flag,r[i].rel);
+}
+
+int esdIndexFromSym(esd e[],int esdPointer, char a[]){
+    int i = 0;
+    while(i<esdPointer){
+        if(strcmp(e[i].name,a) == 0){
+            return(i);
+        }
+        i++;
+    }
+}
+
+
+int fitForRld(char temp[] , esd e[] , int esdPointer){
+    int plusEntryCount = 0 , minusEntryCount = 0 ;
+        char op = '+';
+        int z = 2;
+        int zLen = strlen(temp);
+        char tempz[30];
+        int tempZPointer = 0;
+        char * charArray [10];
+        int charPointer = 0;
+        for(z=2;z<zLen;z++){
+            if(temp[z] != '+' && temp[z] != '-' && temp[z] != ')'){
+                tempz[tempZPointer++] = temp[z];
+            }
+            else{
+                tempz[tempZPointer] = '\0';
+                char t2[30];
+                strcpy(t2,tempz);
+                charArray[charPointer++] = &t2;
+                if(!(tempz[0] >= '0' && tempz[0] <= '9')){
+                    int index = esdIndexFromSym(e,esdPointer, tempz);
+                    if(strcmp(e[index].type , "ER") == 0){
+                        return(1);
+                    }
+                    else if(op == '+')
+                        plusEntryCount += 1;
+                    else
+                        minusEntryCount += 1;
+                }
+                tempZPointer = 0;
+                op = temp[z];
+            }
+        }
+    if(plusEntryCount == minusEntryCount)
+        return(0);
+    else
+        return(1);
+}
+
 int main()
 {
     int n=30 , i = 0;
@@ -263,15 +323,17 @@ int main()
         else if(i>0){
             l[i].rel = l[i-1].rel;
         }
-        printf("\n%d\t%s\t%s\t%s\n",l[i].rel,l[i].name,l[i].inst,l[i].arg);
+        printf("\n\t%d\t%s\t%s\t%s\n",l[i].rel,l[i].name,l[i].inst,l[i].arg);
         i++;
     }
     int num = i;
     txt t[30];
+    rld r[30];
     int esdPointer = esdMaker(e,l,num);
     printESD(e,esdPointer);
     int txtPointer = txtMaker(t , l , e , num , esdPointer);
     printTxt(t ,txtPointer);
-
+    int rldPointer = rldMaker(r,e,esdPointer,l,num);
+    printRld(r,rldPointer);
     return 0;
 }
